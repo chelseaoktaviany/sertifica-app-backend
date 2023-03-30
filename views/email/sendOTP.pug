@@ -1,0 +1,6 @@
+extends baseEmail 
+
+block content 
+    p Hi #{name},
+    p This OTP will be expired in 5 minutes. Please verify your account.
+    p(style="font-weight: bold; font-size: 22px") #{otp}
