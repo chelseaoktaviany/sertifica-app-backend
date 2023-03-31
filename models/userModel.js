@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: function () {
-        if (this.role !== 'publisher' && this.role !== 'admin') {
+        if (this.role === 'publisher' && this.role === 'admin') {
           return [true, 'You must enter your full name'];
         }
       },
@@ -23,12 +23,20 @@ const userSchema = new mongoose.Schema(
     },
     firstName: {
       type: String,
-      required: [true, 'You must enter your first name'],
+      required: function () {
+        if (this.role !== 'publisher' && this.role !== 'admin') {
+          return [true, 'You must enter your first name'];
+        }
+      },
       trim: true,
     },
     lastName: {
       type: String,
-      required: [true, 'You must enter your last name'],
+      required: function () {
+        if (this.role !== 'publisher' && this.role !== 'admin') {
+          return [true, 'You must enter your last name'];
+        }
+      },
       trim: true,
     },
     companyName: {
@@ -83,11 +91,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'default.jpeg',
     },
-    OTP: {
-      type: String,
+    otp: {
+      type: Number,
       expires: '5m',
       index: true,
     },
+    otpExpiration: Date,
     isActive: {
       type: Boolean,
       default: false,

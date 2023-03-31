@@ -4,15 +4,25 @@ const sharp = require('sharp');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-
 const { generateOTP } = require('../utils/otp');
+
 const Email = require('../utils/email');
 
 // models
 const User = require('../models/userModel');
 
 // global variables
-var emailAddress;
+let emailAddress;
+
+const generateAndSaveOtp = async (user) => {
+  // melakukan mengirim otp
+  const otp = generateOTP(4);
+  user.otp = otp;
+  user.otpExpiration = new Date(Date.now() + 5 * 60 * 1000); // berlaku selama 5 menit
+
+  await user.save();
+  return otp;
+};
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -125,8 +135,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   try {
     // email untuk OTP
-    const otp = generateOTP(4);
-    newUser.OTP = otp;
+    newUser.otp = await generateAndSaveOtp(newUser);
     newUser.save({ validateBeforeSave: false });
 
     // console.log(newUser);
@@ -139,7 +148,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       msg: 'Success! E-mail berisi OTP akan dikirim',
     });
   } catch (err) {
-    newUser.OTP = undefined;
+    newUser.otp = undefined;
     newUser.save({ validateBeforeSave: false });
 
     return next(
@@ -162,15 +171,14 @@ exports.signUp = catchAsync(async (req, res, next) => {
 exports.resendOTP = catchAsync(async (req, res, next) => {
   try {
     // email untuk OTP
-    const existedUser = await User.findOne({ emailAddress });
+    const user = await User.findOne({ emailAddress });
 
     // console.log(existedUser);
 
-    const otp = generateOTP(4);
-    existedUser.OTP = otp;
-    existedUser.save({ validateBeforeSave: false });
+    user.OTP = await generateAndSaveOtp(user);
+    user.save({ validateBeforeSave: false });
 
-    await new Email(existedUser).sendOTP();
+    await new Email(user).sendOTP();
 
     // kirim response
     res.status(201).json({
@@ -178,9 +186,10 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
       msg: 'OTP telah dikirim ke e-mail, mohon periksa e-mail Anda',
     });
   } catch (err) {
-    const existedUser = await User.findOne({ emailAddress });
-    existedUser.OTP = undefined;
-    existedUser.save({ validateBeforeSave: false });
+    const user = await User.findOne({ emailAddress });
+    user.otp = undefined;
+    user.otpExpiration = undefined;
+    user.save({ validateBeforeSave: false });
 
     return next(
       new AppError(
@@ -200,9 +209,10 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
 //  * @throws - 404 (Publisher not found), 400 (OTP invalid or wrong), 403 (OTP has been expired) & 500 (Internal Server Error)
 //  */
 exports.verifyOTP = catchAsync(async (req, res, next) => {
-  const { id } = req.body;
-  const user = await User.findById(id);
+  const otp = req.body.otp;
+  const user = await User.findOne({ emailAddress });
 
+  // memeriksa jika akun tidak ditemukan
   if (!user) {
     return next(new AppError('Akun tidak ditemukan!', 404));
   }
@@ -211,28 +221,25 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
     user.isActive = true;
   }
 
-  if (req.body.otp !== user.OTP) {
+  // memeriksa jika OTP benar
+  if (otp !== user.otp) {
     return next(new AppError('Kode OTP salah', 401));
   }
 
-  // set expired date
-  const expired = Date.now() + 30 * 10 * 1000; // 5 minutes
-
-  const currentDate = Date.now();
-
   // memeriksa jika kode OTP kedaluarsa
-  if (expired > currentDate) {
-    user.OTP = undefined;
+  if (user.otpExpiration < new Date()) {
+    user.otp = undefined;
+    user.otpExpiration = undefined;
     user.save({ validateBeforeSave: false });
 
-    // create token
-    createSendToken(user, 200, 'Berhasil verifikasi OTP', req, res);
-  } else {
-    user.OTP = undefined;
-    user.save({ validateBeforeSave: false });
-
-    return next(
-      new AppError('OTP code has been expired, please resend an OTP code', 401)
-    );
+    return next(new AppError('OTP sudah kedaluarsa', 401));
   }
+
+  // otp is valid
+  user.otp = undefined;
+  user.otpExpiration = undefined;
+  user.save({ validateBeforeSave: false });
+
+  // create token
+  createSendToken(user, 200, 'Berhasil verifikasi OTP', req, res);
 });
