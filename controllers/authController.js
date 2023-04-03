@@ -139,8 +139,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
     newUser.otp = await generateAndSaveOtp(newUser);
     await newUser.save({ validateBeforeSave: false });
 
-    // console.log(newUser);
-
     await new Email(newUser).sendOTP();
 
     // mengirim response
@@ -183,8 +181,6 @@ exports.signIn = catchAsync(async (req, res, next) => {
     user.otp = await generateAndSaveOtp(user);
     await user.save({ validateBeforeSave: false });
 
-    // console.log(newUser);
-
     await new Email(user).sendOTP();
 
     // mengirim response
@@ -221,8 +217,6 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
   try {
     // email untuk OTP
     const user = await User.findOne({ emailAddress });
-
-    // console.log(existedUser);
 
     user.OTP = await generateAndSaveOtp(user);
     await user.save({ validateBeforeSave: false });
