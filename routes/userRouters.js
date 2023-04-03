@@ -19,6 +19,8 @@ router.post(
   authController.signUp
 );
 
+router.post('/signIn', authController.signIn);
+
 router.get('/resendOTP', resendOTPRateLimiter, authController.resendOTP);
 router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 

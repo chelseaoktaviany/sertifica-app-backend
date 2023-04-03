@@ -24,14 +24,14 @@ const generateAndSaveOtp = async (user) => {
   return otp;
 };
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
 const createSendToken = (user, statusCode, msg, req, res) => {
-  const token = signToken(user._id);
+  const token = signToken(user._id, user.role);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -45,6 +45,7 @@ const createSendToken = (user, statusCode, msg, req, res) => {
     msg,
     data: {
       id: user._id,
+      role: user.role,
     },
     token,
   });
@@ -136,7 +137,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
   try {
     // email untuk OTP
     newUser.otp = await generateAndSaveOtp(newUser);
-    newUser.save({ validateBeforeSave: false });
+    await newUser.save({ validateBeforeSave: false });
 
     // console.log(newUser);
 
@@ -149,7 +150,55 @@ exports.signUp = catchAsync(async (req, res, next) => {
     });
   } catch (err) {
     newUser.otp = undefined;
-    newUser.save({ validateBeforeSave: false });
+    await newUser.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
+        500
+      )
+    );
+  }
+});
+
+// /**
+//  * Sign in user, Melakukan sign in pengguna menggunakan alamat e-mail
+//  * @async
+//  * @method
+//  * @field - {emailAddress: e-mail}
+//  * @returns status, msg, data
+//  * @throws - 401 (E-mail belum terdaftar), 429 (Too many requests) & 500 (Internal Server Error)
+//  */
+exports.signIn = catchAsync(async (req, res, next) => {
+  emailAddress = req.body.emailAddress;
+
+  const user = await User.findOne({ emailAddress });
+
+  if (!user) {
+    return next(new AppError('E-mail belum terdaftar'));
+  }
+
+  try {
+    // email untuk OTP
+    user.otp = await generateAndSaveOtp(user);
+    await user.save({ validateBeforeSave: false });
+
+    // console.log(newUser);
+
+    await new Email(user).sendOTP();
+
+    // mengirim response
+    res.status(201).json({
+      status: 0,
+      msg: 'Success! E-mail berisi OTP akan dikirim',
+      data: {
+        emailAddress: user.emailAddress,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    user.otp = undefined;
+    await user.save({ validateBeforeSave: false });
 
     return next(
       new AppError(
@@ -176,7 +225,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
     // console.log(existedUser);
 
     user.OTP = await generateAndSaveOtp(user);
-    user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
 
     await new Email(user).sendOTP();
 
@@ -189,7 +238,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
     const user = await User.findOne({ emailAddress });
     user.otp = undefined;
     user.otpExpiration = undefined;
-    user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
 
     return next(
       new AppError(
@@ -219,6 +268,7 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
 
   if (user.isActive === false) {
     user.isActive = true;
+    await user.save({ validateBeforeSave: false });
   }
 
   // memeriksa jika OTP benar
@@ -230,7 +280,7 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
   if (user.otpExpiration < new Date()) {
     user.otp = undefined;
     user.otpExpiration = undefined;
-    user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
 
     return next(new AppError('OTP sudah kedaluarsa', 401));
   }
@@ -238,7 +288,7 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
   // otp is valid
   user.otp = undefined;
   user.otpExpiration = undefined;
-  user.save({ validateBeforeSave: false });
+  await user.save({ validateBeforeSave: false });
 
   // create token
   createSendToken(user, 200, 'Berhasil verifikasi OTP', req, res);
