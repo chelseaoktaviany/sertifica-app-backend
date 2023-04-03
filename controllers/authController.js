@@ -132,8 +132,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   const newUser = await User.create(filteredBody);
 
-  console.log(newUser);
-
   try {
     // email untuk OTP
     newUser.otp = await generateAndSaveOtp(newUser);
