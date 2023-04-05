@@ -9,7 +9,7 @@ const router = express.Router();
 // routers
 router.use(authController.protect);
 
-router.use(authController.restrictTo('publisher'));
+router.use(authController.restrictTo('publisher', 'admin'));
 
 // certificate manipulation
 
@@ -25,5 +25,8 @@ router
     certificateController.resizeFile,
     certificateController.publishCertificate
   );
+
+// certificate owner
+// router.post('/addOwner', certificateController.addOwner);
 
 module.exports = router;
