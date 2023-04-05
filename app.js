@@ -14,11 +14,14 @@ const cors = require('cors');
 
 require('dotenv').config({ path: './config.env' });
 
-// untuk router & error handling (nanti)
+// error handling
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
+// routers
 const testAPIRouters = require('./routes/testAPIRouters');
 const userRouters = require('./routes/userRouters');
+const certificateRouters = require('./routes/certificateRouters');
 
 // memulai aplikasi express
 const app = express();
@@ -143,6 +146,7 @@ app.use((req, res, next) => {
 // api routes
 app.use('/v1/testAPI', testAPIRouters);
 app.use('/v1/users', userRouters);
+app.use('/v1/certificates', certificateRouters);
 
 // jika endpoint tidak ditemukan
 app.all('*', (req, res, next) => {
