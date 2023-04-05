@@ -24,9 +24,13 @@ router.post('/signIn', authController.signIn);
 router.get('/resendOTP', resendOTPRateLimiter, authController.resendOTP);
 router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 
-router
-  .route('/')
-  // .get(userController.getAllUsers)
-  .get(userController.getAllUsers);
+// protect
+router.use(authController.protect);
+
+// restriction middleware
+router.use(authController.restrictTo('admin'));
+
+// user management
+router.route('/').get(userController.getAllUsers);
 
 module.exports = router;

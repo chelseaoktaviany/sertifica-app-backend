@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 const multer = require('multer');
 const sharp = require('sharp');
 
@@ -285,3 +286,78 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
   // create token
   createSendToken(user, 200, 'Berhasil verifikasi OTP', req, res);
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // getting token
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return next(
+      new AppError(
+        'Anda belum log in, mohon lakukan login untuk mendapatkan akses token',
+        401
+      )
+    );
+  }
+
+  // verifikasi token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // memeriksa jika pengguna sudah ada
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(new AppError('Token itu yang dia miliki sudah tidak ada'));
+  }
+
+  // grant access to protected route
+  req.user = currentUser;
+  res.locals.user = currentUser;
+  next();
+});
+
+// logged in
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if (req.cookies.jwt) {
+      // verifikasi token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // memeriksa jika pengguna sudah ada
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // ada pengguna yang sudah login
+      res.locals.user = currentUser;
+      return next();
+    }
+  } catch (err) {
+    return next();
+  }
+};
+
+// restrict to specified roles
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles['admin', 'super-admin'], role='user'
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You don't have a permission to perform this action", 403)
+      );
+    }
+
+    next();
+  };
+};
