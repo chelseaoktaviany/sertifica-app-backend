@@ -104,7 +104,6 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ['admin', 'publisher', 'certificate-owner'],
-      required: true,
     },
   },
   { timestamps: true, versionKey: false }
