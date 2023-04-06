@@ -1,8 +1,7 @@
-// controllers
-// const factory = require('./handlerFactory');
-
 // models
 const User = require('../models/userModel');
+
+// utils
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {

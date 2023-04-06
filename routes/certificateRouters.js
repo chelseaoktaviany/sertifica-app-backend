@@ -26,7 +26,4 @@ router
     certificateController.publishCertificate
   );
 
-// certificate owner
-// router.post('/addOwner', certificateController.addOwner);
-
 module.exports = router;

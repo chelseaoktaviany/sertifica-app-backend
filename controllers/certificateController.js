@@ -108,28 +108,3 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     data: { certificate },
   });
 });
-
-// add certificate owner
-// exports.addOwner = catchAsync(async (req, res, next) => {
-//   const filteredBody = filterObj(
-//     req.body,
-//     'firstName',
-//     'lastName',
-//     'emailAddress',
-//     'nomorHP',
-//     'role'
-//   );
-
-//   console.log(filteredBody);
-
-//   if (filteredBody.role === 'certificate-owner') {
-//     const user = await User.create(filteredBody);
-
-//     // mengirim response
-//     res.status(201).json({
-//       status: 0,
-//       msg: 'Success! Berhasil melakukan pembuatan akun pemilik sertifikat',
-//       data: { user },
-//     });
-//   }
-// });

@@ -133,28 +133,40 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   const newUser = await User.create(filteredBody);
 
-  try {
-    // email untuk OTP
-    newUser.otp = await generateAndSaveOtp(newUser);
-    await newUser.save({ validateBeforeSave: false });
+  if (newUser.role === 'publisher' || newUser.role === 'admin') {
+    try {
+      // email untuk OTP
+      newUser.otp = await generateAndSaveOtp(newUser);
+      await newUser.save({ validateBeforeSave: false });
 
-    await new Email(newUser).sendOTP();
+      await new Email(newUser).sendOTP();
+
+      // mengirim response
+      res.status(201).json({
+        status: 0,
+        msg: 'Success! E-mail berisi OTP akan dikirim',
+      });
+    } catch (err) {
+      newUser.otp = undefined;
+      await newUser.save({ validateBeforeSave: false });
+
+      return next(
+        new AppError(
+          'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
+          500
+        )
+      );
+    }
+  } else if (newUser.role === 'certificate-owner') {
+    newUser.isActive = true;
+    await newUser.save({ validateBeforeSave: false });
 
     // mengirim response
     res.status(201).json({
       status: 0,
-      msg: 'Success! E-mail berisi OTP akan dikirim',
+      msg: 'Success! Berhasil melakukan pembuatan akun pemilik sertifikat',
+      data: { newUser },
     });
-  } catch (err) {
-    newUser.otp = undefined;
-    await newUser.save({ validateBeforeSave: false });
-
-    return next(
-      new AppError(
-        'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
-        500
-      )
-    );
   }
 });
 
