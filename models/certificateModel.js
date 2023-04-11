@@ -20,17 +20,20 @@ const certificateSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.String,
       ref: 'CertCategory',
     },
-
     // recepient
     recepient: {
-      name: {
-        type: String,
-        required: [true, 'Mohon isi nama pemilik sertifikat'],
-      },
-      emailAddress: {
-        type: String,
-        required: [true, 'Mohon isi alamat e-mail pemilik sertifikat'],
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    recepientName: {
+      type: mongoose.Schema.Types.String,
+      ref: 'User',
+      required: [true, 'Mohon isi nama pemilik sertifikat'],
+    },
+    recepientEmailAddress: {
+      type: mongoose.Schema.Types.String,
+      ref: 'User',
+      required: [true, 'Mohon isi alamat e-mail pemilik sertifikat'],
     },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
@@ -40,6 +43,7 @@ const certificateSchema = new mongoose.Schema(
 certificateSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'recepient',
+    select: 'firstName lastName emailAddress',
   });
 
   next();
