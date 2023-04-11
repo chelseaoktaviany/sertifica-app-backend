@@ -30,7 +30,7 @@ router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 router.use(authController.protect);
 
 // get user certificates
-router.get('/:userId/certificates', userController.getUserCertificates);
+router.get('/:id/certificates', userController.getUserCertificates);
 
 // user management
 router
