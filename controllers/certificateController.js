@@ -53,23 +53,35 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-// get all certificates
-exports.getAllCertificates = factory.getAll(
-  Certificate,
-  'Berhasil mengakses data sertifikat'
-);
-
 // add category
 exports.addCertCategory = factory.createOne(
   CertCategory,
   'Added category successful'
 );
 
-// publish certificate
-exports.publishCertificate = catchAsync(async (req, res, next) => {
-  const filteredBody = filterObj(req.body, 'fileName', 'category', 'recepient');
+// get all certificates
+exports.getAllCertificates = factory.getAll(
+  Certificate,
+  'Berhasil mengakses data sertifikat'
+);
 
-  console.log(filteredBody);
+// get certificates
+exports.getCertificate = factory.getOne(
+  Certificate,
+  'Berhasil mengakses data sertifikat'
+);
+
+// add certificate
+exports.publishCertificate = catchAsync(async (req, res, next) => {
+  const filteredBody = filterObj(
+    req.body,
+    'file',
+    'fileName',
+    'category',
+    'recepient',
+    'recepientName',
+    'recepientEmailAddress'
+  );
 
   // saving file to database
   if (req.file) filteredBody.file = req.file.filename;
@@ -79,8 +91,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   });
 
   const recepient = await User.findOne({
-    name: filteredBody.recepient.name,
-    emailAddress: filteredBody.recepient.emailAddress,
+    _id: filteredBody.recepient,
     role: 'certificate-owner',
   });
 
@@ -96,10 +107,9 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     file: filteredBody.file,
     fileName: filteredBody.fileName,
     category: filteredBody.category,
-    recepient: {
-      name: filteredBody.recepient.name,
-      emailAddress: filteredBody.recepient.emailAddress,
-    },
+    recepient: filteredBody.recepient,
+    recepientName: filteredBody.recepientName,
+    recepientEmailAddress: filteredBody.recepientEmailAddress,
   });
 
   res.status(201).json({
