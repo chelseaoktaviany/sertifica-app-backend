@@ -1,9 +1,49 @@
+const multer = require('multer');
+const sharp = require('sharp');
+
+//controllers
+const factory = require('./handlerFactory');
+
 // models
 const User = require('../models/userModel');
 const { Certificate } = require('../models/certificateModel');
 
-// utils
+// util
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+
+// multer storage
+const multerStorage = multer.memoryStorage();
+
+// multer filter
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('You must fill your profile picture', 400), false);
+  }
+};
+
+// using multer middleware multi-part form data (upload pics)
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+// upload user photo
+exports.uploadUserPhoto = upload.single('profileImage');
+
+// resizing uploaded image (middleware)
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.body.profileImage = `user-${Date.now()}.jpeg`;
+
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.body.profileImage}`);
+
+  next();
+});
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const user = await User.aggregate([
@@ -27,6 +67,17 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     data: user,
   });
 });
+
+// get user
+exports.getUser = factory.getOne(
+  User,
+  { path: '_id' },
+  'Retrieved user data successfully'
+);
+
+exports.updateUser = factory.updateOne(User, 'Update successful');
+
+exports.deleteUser = factory.deleteOne(User, 'Delete successful');
 
 exports.getUserCertificates = catchAsync(async (req, res, next) => {
   const id = req.params.id;
