@@ -164,7 +164,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     // mengirim response
     res.status(201).json({
       status: 0,
-      msg: 'Success! Berhasil melakukan pembuatan akun pemilik sertifikat',
+      msg: 'Add certificate owner successful',
       data: { newUser },
     });
   }
