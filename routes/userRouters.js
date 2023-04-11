@@ -3,6 +3,8 @@ const express = require('express');
 const authController = require('../controllers/authController');
 const userController = require('../controllers/userController');
 
+// router
+
 // middlewares
 const {
   resendOTPRateLimiter,
@@ -20,17 +22,19 @@ router.post(
 );
 
 router.post('/signIn', authController.signIn);
+router.get('/signOut', authController.signOut);
 
 router.get('/resendOTP', resendOTPRateLimiter, authController.resendOTP);
 router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 
-// protect
 router.use(authController.protect);
 
-// restriction middleware
-router.use(authController.restrictTo('admin'));
+// get user certificates
+router.get('/:userId/certificates', userController.getUserCertificates);
 
 // user management
-router.route('/').get(userController.getAllUsers);
+router
+  .route('/')
+  .get(authController.restrictTo('admin'), userController.getAllUsers);
 
 module.exports = router;
