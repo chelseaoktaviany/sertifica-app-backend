@@ -41,7 +41,7 @@ const certificateSchema = new mongoose.Schema(
 
 // pre hook middleware
 certificateSchema.pre(/^find/, function (next) {
-  this.populate({
+  this.populate('recepient').populate({
     path: 'recepient',
     select: 'firstName lastName emailAddress',
   });
