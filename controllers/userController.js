@@ -1,5 +1,6 @@
 // models
 const User = require('../models/userModel');
+const { Certificate } = require('../models/certificateModel');
 
 // utils
 const catchAsync = require('../utils/catchAsync');
@@ -24,5 +25,19 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     status: 0,
     msg: "Retrieved all users' data successfully",
     data: user,
+  });
+});
+
+exports.getUserCertificates = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const certificates = await Certificate.find({
+    recepient: id,
+  });
+
+  res.status(200).json({
+    status: 0,
+    results: certificates.length,
+    msg: 'Berhasil mengakses sertifikat pengguna',
+    data: { certificates },
   });
 });
