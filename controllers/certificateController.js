@@ -68,6 +68,7 @@ exports.getAllCertificates = factory.getAll(
 // get certificates
 exports.getCertificate = factory.getOne(
   Certificate,
+  { path: '_id' },
   'Berhasil mengakses data sertifikat'
 );
 
