@@ -30,11 +30,25 @@ router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 router.use(authController.protect);
 
 // get user certificates
-router.get('/:id/certificates', userController.getUserCertificates);
+router.get(
+  '/:id/certificates',
+  authController.restrictTo('certificate-owner'),
+  userController.getUserCertificates
+);
 
 // user management
+router.use(authController.restrictTo('admin'));
+
+router.route('/').get(userController.getAllUsers);
+
 router
-  .route('/')
-  .get(authController.restrictTo('admin'), userController.getAllUsers);
+  .route('/:id')
+  .get(userController.getUser)
+  .patch(
+    userController.uploadUserPhoto,
+    userController.resizeUserPhoto,
+    userController.updateUser
+  )
+  .delete(userController.deleteUser);
 
 module.exports = router;
