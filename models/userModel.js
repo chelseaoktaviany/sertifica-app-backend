@@ -106,7 +106,10 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'publisher', 'certificate-owner'],
     },
   },
-  { timestamps: true, versionKey: false }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 const User = mongoose.model('User', userSchema);
