@@ -217,6 +217,22 @@ exports.signIn = catchAsync(async (req, res, next) => {
 });
 
 // /**
+//  * Sign out user, Melakukan sign out pengguna untuk mengakhiri sesi
+//  * @async
+//  * @method
+//  * @returns status, msg
+//  * @throws - 500 (Internal Server Error)
+//  */
+exports.signOut = catchAsync(async (req, res, next) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: 0, msg: 'Success' });
+});
+
+// /**
 //  * Pengiriman OTP, mengirim OTP kepada e-mail pengguna
 //  * @async
 //  * @method
