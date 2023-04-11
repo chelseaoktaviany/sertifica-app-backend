@@ -6,24 +6,37 @@ const certificateController = require('../controllers/certificateController');
 
 const router = express.Router();
 
-// routers
 router.use(authController.protect);
 
-router.use(authController.restrictTo('publisher', 'admin'));
-
-// certificate manipulation
+// certificate routers
 
 // certificate category
-router.post('/category', certificateController.addCertCategory);
+router.post(
+  '/category',
+  authController.restrictTo('publisher'),
+  certificateController.addCertCategory
+);
 
 // certificates
 router
   .route('/')
-  .get(certificateController.getAllCertificates)
+  .get(
+    authController.restrictTo('publisher'),
+    certificateController.getAllCertificates
+  )
   .post(
+    authController.restrictTo('publisher'),
     certificateController.uploadFile,
     certificateController.resizeFile,
     certificateController.publishCertificate
+  );
+
+// get certificate
+router
+  .route('/:id')
+  .get(
+    authController.restrictTo('certificate-owner'),
+    certificateController.getCertificate
   );
 
 module.exports = router;
