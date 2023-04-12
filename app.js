@@ -19,7 +19,6 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
 // routers
-const testAPIRouters = require('./routes/testAPIRouters');
 const userRouters = require('./routes/userRouters');
 const certificateRouters = require('./routes/certificateRouters');
 
@@ -144,7 +143,6 @@ app.use((req, res, next) => {
 });
 
 // api routes
-app.use('/v1/testAPI', testAPIRouters);
 app.use('/v1/users', userRouters);
 app.use('/v1/certificates', certificateRouters);
 
