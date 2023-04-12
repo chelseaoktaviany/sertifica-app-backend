@@ -36,6 +36,12 @@ router.get(
   userController.getUserCertificates
 );
 
+router.post(
+  '/',
+  authController.restrictTo('publisher'),
+  userController.createCertificateOwner
+);
+
 // user management
 router.use(authController.restrictTo('admin'));
 
