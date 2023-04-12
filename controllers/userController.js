@@ -92,3 +92,31 @@ exports.getUserCertificates = catchAsync(async (req, res, next) => {
     data: { certificates },
   });
 });
+
+// create certificate owner
+exports.createCertificateOwner = catchAsync(async (req, res, next) => {
+  const { firstName, lastName, emailAddress, nomorHP } = req.body;
+
+  const user = await User.findOne({ emailAddress });
+
+  if (user) {
+    return next(new AppError('E-mail sudah terdaftar', 409));
+  }
+
+  const newUser = await User.create({
+    firstName,
+    lastName,
+    emailAddress,
+    nomorHP,
+    role: 'certificate-owner',
+  });
+
+  newUser.isActive = true;
+  await newUser.save({ validateBeforeSave: false });
+
+  res.status(201).json({
+    status: 0,
+    msg: 'Add certificate owner successful',
+    data: newUser,
+  });
+});
