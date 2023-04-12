@@ -34,13 +34,13 @@ exports.uploadFile = upload.single('file');
 exports.resizeFile = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `certificate-${Date.now()}.jpeg`;
+  req.body.file = `certificate-${Date.now()}.jpeg`;
 
   sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/certificates/${req.file.filename}`);
+    .toFile(`public/img/certificates/${req.body.file}`);
 
   next();
 });
@@ -85,7 +85,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   );
 
   // saving file to database
-  if (req.file) filteredBody.file = req.file.filename;
+  // if (req.file) filteredBody.file = req.file.filename;
 
   const certCategory = await CertCategory.findOne({
     category: filteredBody.category,
