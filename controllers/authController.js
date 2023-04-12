@@ -74,24 +74,16 @@ exports.uploadUserPhoto = upload.single('profileImage');
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `user-${Date.now()}.jpeg`;
+  req.body.profileImage = `user-${Date.now()}.jpeg`;
 
   sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    .toFile(`public/img/users/${req.body.profileImage}`);
 
   next();
 });
-
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
 
 // signup mendaftar akun pengguna menggunakan e-mail (DONE)
 /**
@@ -105,23 +97,15 @@ const filterObj = (obj, ...allowedFields) => {
 exports.signUp = catchAsync(async (req, res, next) => {
   emailAddress = req.body.emailAddress;
 
-  const filteredBody = filterObj(
-    req.body,
-    'name',
-    'firstName',
-    'lastName',
-    'companyName',
-    'address',
-    'emailAddress',
-    'nomorHP',
-    'jobTitle',
-    'postalCode',
-    'role'
-  );
-
-  // console.log(filteredBody);
-
-  if (req.file) filteredBody.profileImage = req.file.filename;
+  const {
+    name,
+    companyName,
+    address,
+    nomorHP,
+    jobTitle,
+    postalCode,
+    profileImage,
+  } = req.body;
 
   const user = await User.findOne({
     emailAddress,
@@ -131,42 +115,40 @@ exports.signUp = catchAsync(async (req, res, next) => {
     return next(new AppError('E-mail sudah terdaftar', 409));
   }
 
-  const newUser = await User.create(filteredBody);
+  const newUser = await User.create({
+    name,
+    companyName,
+    address,
+    emailAddress,
+    nomorHP,
+    jobTitle,
+    postalCode,
+    profileImage,
+    role: 'publisher',
+  });
 
-  if (newUser.role === 'publisher' || newUser.role === 'admin') {
-    try {
-      // email untuk OTP
-      newUser.otp = await generateAndSaveOtp(newUser);
-      await newUser.save({ validateBeforeSave: false });
-
-      await new Email(newUser).sendOTP();
-
-      // mengirim response
-      res.status(201).json({
-        status: 0,
-        msg: 'Success! E-mail berisi OTP akan dikirim',
-      });
-    } catch (err) {
-      newUser.otp = undefined;
-      await newUser.save({ validateBeforeSave: false });
-
-      return next(
-        new AppError(
-          'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
-          500
-        )
-      );
-    }
-  } else if (newUser.role === 'certificate-owner') {
-    newUser.isActive = true;
+  try {
+    // email untuk OTP
+    newUser.otp = await generateAndSaveOtp(newUser);
     await newUser.save({ validateBeforeSave: false });
+
+    await new Email(newUser).sendOTP();
 
     // mengirim response
     res.status(201).json({
       status: 0,
-      msg: 'Add certificate owner successful',
-      data: { newUser },
+      msg: 'Success! E-mail berisi OTP akan dikirim',
     });
+  } catch (err) {
+    newUser.otp = undefined;
+    await newUser.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
+        500
+      )
+    );
   }
 });
 
