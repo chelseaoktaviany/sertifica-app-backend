@@ -113,7 +113,7 @@ const limiter = rateLimit({
     'Terlalu banyak request dari IP ini, mohon dicoba lagi di dalam 1 jam',
 });
 
-app.use('/v1', limiter);
+app.use('/v1/ser', limiter);
 
 // menggunakan express body parser
 app.use(express.json({ limit: '10kb' }));
@@ -143,8 +143,8 @@ app.use((req, res, next) => {
 });
 
 // api routes
-app.use('/v1/users', userRouters);
-app.use('/v1/certificates', certificateRouters);
+app.use('/v1/ser/users', userRouters);
+app.use('/v1/ser/certificates', certificateRouters);
 
 // jika endpoint tidak ditemukan
 app.all('*', (req, res, next) => {
