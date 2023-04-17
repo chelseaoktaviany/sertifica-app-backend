@@ -53,6 +53,12 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
+// get all categories
+exports.getAllCertCategories = factory.getAll(
+  CertCategory,
+  'Berhasil mengakses data sertifikat kategori'
+);
+
 // add category
 exports.addCertCategory = factory.createOne(
   CertCategory,
