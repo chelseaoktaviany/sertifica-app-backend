@@ -11,6 +11,12 @@ router.use(authController.protect);
 // certificate routers
 
 // certificate category
+router.get(
+  '/category',
+  authController.restrictTo('publisher'),
+  certificateController.getAllCertCategories
+);
+
 router.post(
   '/category',
   authController.restrictTo('publisher'),
