@@ -127,29 +127,10 @@ exports.signUp = catchAsync(async (req, res, next) => {
     role: 'publisher',
   });
 
-  try {
-    // email untuk OTP
-    newUser.otp = await generateAndSaveOtp(newUser);
-    await newUser.save({ validateBeforeSave: false });
+  newUser.isActive = true;
+  newUser.save({ validateBeforeSave: false });
 
-    await new Email(newUser).sendOTP();
-
-    // mengirim response
-    res.status(201).json({
-      status: 0,
-      msg: 'Success! E-mail berisi OTP akan dikirim',
-    });
-  } catch (err) {
-    newUser.otp = undefined;
-    await newUser.save({ validateBeforeSave: false });
-
-    return next(
-      new AppError(
-        'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
-        500
-      )
-    );
-  }
+  createSendToken(newUser, 201, 'Berhasil signup publisher', req, res);
 });
 
 // /**
