@@ -150,32 +150,34 @@ exports.signIn = catchAsync(async (req, res, next) => {
     return next(new AppError('E-mail belum terdaftar'));
   }
 
-  try {
-    // email untuk OTP
-    user.otp = await generateAndSaveOtp(user);
-    await user.save({ validateBeforeSave: false });
+  if (user.emailAddress) {
+    try {
+      // email untuk OTP
+      user.otp = await generateAndSaveOtp(user);
+      await user.save({ validateBeforeSave: false });
 
-    await new Email(user).sendOTP();
+      await new Email(user).sendOTP();
 
-    // mengirim response
-    res.status(201).json({
-      status: 0,
-      msg: 'Success! E-mail berisi OTP akan dikirim',
-      data: {
-        emailAddress: user.emailAddress,
-        role: user.role,
-      },
-    });
-  } catch (err) {
-    user.otp = undefined;
-    await user.save({ validateBeforeSave: false });
+      // mengirim response
+      res.status(200).json({
+        status: 0,
+        msg: 'Success! E-mail berisi OTP akan dikirim',
+        data: {
+          emailAddress: user.emailAddress,
+          role: user.role,
+        },
+      });
+    } catch (err) {
+      user.otp = undefined;
+      await user.save({ validateBeforeSave: false });
 
-    return next(
-      new AppError(
-        'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
-        500
-      )
-    );
+      return next(
+        new AppError(
+          'Ada kesalahan yang terjadi saat mengirim e-mail, mohon dicoba lagi',
+          500
+        )
+      );
+    }
   }
 });
 
