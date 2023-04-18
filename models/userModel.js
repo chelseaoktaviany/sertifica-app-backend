@@ -42,16 +42,18 @@ const userSchema = new mongoose.Schema(
     companyName: {
       type: String,
       required: function () {
-        if (this.role === 'publisher')
+        if (this.role === 'publisher') {
           return [true, 'You must enter your company name'];
+        }
       },
       trim: true,
     },
     address: {
       type: String,
       required: function () {
-        if (this.role === 'publisher')
+        if (this.role === 'publisher') {
           return [true, 'You must enter your address'];
+        }
       },
       trim: true,
     },
@@ -74,16 +76,18 @@ const userSchema = new mongoose.Schema(
     jobTitle: {
       type: String,
       required: function () {
-        if (this.role === 'publisher')
+        if (this.role === 'publisher') {
           return [true, 'You must enter your job title'];
+        }
       },
       trim: true,
     },
     postalCode: {
       type: String,
       required: function () {
-        if (this.role === 'publisher')
+        if (this.role === 'publisher') {
           return [true, 'You must enter your postal code'];
+        }
       },
       trim: true,
     },
