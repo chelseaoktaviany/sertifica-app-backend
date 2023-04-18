@@ -245,6 +245,9 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
 //  */
 exports.verifyOTP = catchAsync(async (req, res, next) => {
   const otp = req.body.otp;
+
+  console.log(otp);
+
   const user = await User.findOne({ emailAddress });
 
   // memeriksa jika akun tidak ditemukan
