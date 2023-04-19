@@ -69,6 +69,11 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 // get user
+exports.getMe = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+});
+
 exports.getUser = factory.getOne(
   User,
   { path: '_id' },
@@ -108,7 +113,7 @@ exports.createCertificateOwner = catchAsync(async (req, res, next) => {
     lastName,
     emailAddress,
     nomorHP,
-    role: 'certificate-owner',
+    role: 'Certificate Owner',
   });
 
   newUser.isActive = true;
