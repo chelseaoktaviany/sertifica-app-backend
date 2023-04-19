@@ -29,21 +29,24 @@ router.post('/verified', verifyOTPRateLimiter, authController.verifyOTP);
 
 router.use(authController.protect);
 
+// get user
+router.get('/me', userController.getMe, userController.getUser);
+
 // get user certificates
 router.get(
   '/:id/certificates',
-  authController.restrictTo('certificate-owner'),
+  authController.restrictTo('Certificate Owner'),
   userController.getUserCertificates
 );
 
 router.post(
   '/',
-  authController.restrictTo('publisher'),
+  authController.restrictTo('Publisher'),
   userController.createCertificateOwner
 );
 
 // user management
-router.use(authController.restrictTo('admin'));
+router.use(authController.restrictTo('Admin'));
 
 router.route('/').get(userController.getAllUsers);
 
