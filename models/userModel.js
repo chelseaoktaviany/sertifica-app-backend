@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: function () {
-        if (this.role === 'publisher' && this.role === 'admin') {
+        if (this.role === 'Publisher' && this.role === 'Admin') {
           return [true, 'You must enter your full name'];
         }
       },
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: function () {
-        if (this.role !== 'publisher' && this.role !== 'admin') {
+        if (this.role !== 'Publisher' && this.role !== 'Admin') {
           return [true, 'You must enter your first name'];
         }
       },
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
     lastName: {
       type: String,
       required: function () {
-        if (this.role !== 'publisher' && this.role !== 'admin') {
+        if (this.role !== 'Publisher' && this.role !== 'Admin') {
           return [true, 'You must enter your last name'];
         }
       },
@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
     companyName: {
       type: String,
       required: function () {
-        if (this.role === 'publisher') {
+        if (this.role === 'Publisher') {
           return [true, 'You must enter your company name'];
         }
       },
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
     address: {
       type: String,
       required: function () {
-        if (this.role === 'publisher') {
+        if (this.role === 'Publisher') {
           return [true, 'You must enter your address'];
         }
       },
@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema(
     jobTitle: {
       type: String,
       required: function () {
-        if (this.role === 'publisher') {
+        if (this.role === 'Publisher') {
           return [true, 'You must enter your job title'];
         }
       },
@@ -85,7 +85,7 @@ const userSchema = new mongoose.Schema(
     postalCode: {
       type: String,
       required: function () {
-        if (this.role === 'publisher') {
+        if (this.role === 'Publisher') {
           return [true, 'You must enter your postal code'];
         }
       },
@@ -107,7 +107,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'publisher', 'certificate-owner'],
+      enum: ['Admin', 'Publisher', 'Certificate Owner'],
     },
   },
   {
