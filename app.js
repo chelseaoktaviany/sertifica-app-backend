@@ -40,6 +40,7 @@ app.use(cors());
 app.options('*', cors());
 
 // menyajikan static public
+// backend
 app.use(express.static(path.join(__dirname, 'public')));
 
 // menggunakan helmet
