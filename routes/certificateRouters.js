@@ -13,13 +13,13 @@ router.use(authController.protect);
 // certificate category
 router.get(
   '/category',
-  authController.restrictTo('publisher'),
+  authController.restrictTo('Publisher'),
   certificateController.getAllCertCategories
 );
 
 router.post(
   '/category',
-  authController.restrictTo('publisher'),
+  authController.restrictTo('Publisher'),
   certificateController.addCertCategory
 );
 
@@ -27,11 +27,11 @@ router.post(
 router
   .route('/')
   .get(
-    authController.restrictTo('publisher'),
+    authController.restrictTo('Publisher'),
     certificateController.getAllCertificates
   )
   .post(
-    authController.restrictTo('publisher'),
+    authController.restrictTo('Publisher'),
     certificateController.uploadFile,
     certificateController.resizeFile,
     certificateController.publishCertificate
@@ -41,7 +41,7 @@ router
 router
   .route('/:id')
   .get(
-    authController.restrictTo('certificate-owner'),
+    authController.restrictTo('Certificate Owner'),
     certificateController.getCertificate
   );
 
