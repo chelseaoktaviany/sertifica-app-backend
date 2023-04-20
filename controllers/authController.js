@@ -105,6 +105,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     jobTitle,
     postalCode,
     profileImage,
+    role,
   } = req.body;
 
   const user = await User.findOne({
@@ -115,22 +116,41 @@ exports.signUp = catchAsync(async (req, res, next) => {
     return next(new AppError('E-mail sudah terdaftar', 409));
   }
 
-  const newUser = await User.create({
-    name,
-    companyName,
-    address,
-    emailAddress,
-    nomorHP,
-    jobTitle,
-    postalCode,
-    profileImage,
-    role: 'publisher',
-  });
+  if (role === 'Admin') {
+    const newAdmin = await User.create({
+      name,
+      companyName,
+      address,
+      emailAddress,
+      nomorHP,
+      jobTitle,
+      postalCode,
+      profileImage,
+      role: 'Admin',
+    });
 
-  newUser.isActive = true;
-  newUser.save({ validateBeforeSave: false });
+    newAdmin.isActive = true;
+    newAdmin.save({ validateBeforeSave: false });
 
-  createSendToken(newUser, 201, 'Berhasil signup publisher', req, res);
+    createSendToken(newAdmin, 201, 'Berhasil signup', req, res);
+  } else {
+    const newUser = await User.create({
+      name,
+      companyName,
+      address,
+      emailAddress,
+      nomorHP,
+      jobTitle,
+      postalCode,
+      profileImage,
+      role: 'Publisher',
+    });
+
+    newUser.isActive = true;
+    newUser.save({ validateBeforeSave: false });
+
+    createSendToken(newUser, 201, 'Berhasil signup', req, res);
+  }
 });
 
 // /**
