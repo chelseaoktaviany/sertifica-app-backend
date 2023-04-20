@@ -36,7 +36,11 @@ const certificateSchema = new mongoose.Schema(
       required: [true, 'Mohon isi alamat e-mail pemilik sertifikat'],
     },
   },
-  { toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
 );
 
 // pre hook middleware
