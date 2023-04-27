@@ -17,7 +17,7 @@ const router = express.Router();
 router.post(
   '/signUp',
   authController.uploadUserPhoto,
-  authController.resizeUserPhoto,
+  // authController.resizeUserPhoto,
   authController.signUp
 );
 
@@ -55,7 +55,7 @@ router
   .get(userController.getUser)
   .patch(
     userController.uploadUserPhoto,
-    userController.resizeUserPhoto,
+    // userController.resizeUserPhoto,
     userController.updateUser
   )
   .delete(userController.deleteUser);
