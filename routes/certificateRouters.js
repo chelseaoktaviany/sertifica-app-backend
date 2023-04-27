@@ -41,7 +41,7 @@ router
 router
   .route('/:id')
   .get(
-    authController.restrictTo('Certificate Owner'),
+    authController.restrictTo('Certificate Owner', 'Publisher'),
     certificateController.getCertificate
   );
 
