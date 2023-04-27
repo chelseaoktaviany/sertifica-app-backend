@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const multer = require('multer');
-const sharp = require('sharp');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -53,11 +52,21 @@ const createSendToken = (user, statusCode, msg, req, res) => {
 };
 
 // multer storage
-const multerStorage = multer.memoryStorage();
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users/');
+  },
+  filename: (req, file, cb) => {
+    const extension = file.originalname.split('.').pop();
+    cb(null, `user-${Date.now()}.${extension}`);
+  },
+});
 
 // multer filter
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
+  const validExtensions = ['.jpg', '.jpeg', '.png'];
+  const fileExtension = file.originalname.split('.').pop();
+  if (validExtensions.includes(`.${fileExtension}`)) {
     cb(null, true);
   } else {
     cb(new AppError('You must fill your profile picture', 400), false);
@@ -69,21 +78,6 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 // upload user photo
 exports.uploadUserPhoto = upload.single('profileImage');
-
-// resizing uploaded image (middleware)
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-
-  req.body.profileImage = `user-${Date.now()}.jpeg`;
-
-  sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.body.profileImage}`);
-
-  next();
-});
 
 // signup mendaftar akun pengguna menggunakan e-mail (DONE)
 /**
@@ -97,16 +91,8 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 exports.signUp = catchAsync(async (req, res, next) => {
   emailAddress = req.body.emailAddress;
 
-  const {
-    name,
-    companyName,
-    address,
-    nomorHP,
-    jobTitle,
-    postalCode,
-    profileImage,
-    role,
-  } = req.body;
+  const { name, companyName, address, nomorHP, jobTitle, postalCode, role } =
+    req.body;
 
   const user = await User.findOne({
     emailAddress,
@@ -125,7 +111,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       nomorHP,
       jobTitle,
       postalCode,
-      profileImage,
+      profileImage: req.file.path,
       role: 'Admin',
     });
 
@@ -142,7 +128,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       nomorHP,
       jobTitle,
       postalCode,
-      profileImage,
+      profileImage: req.file.path,
       role: 'Publisher',
     });
 
