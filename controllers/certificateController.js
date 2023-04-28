@@ -1,5 +1,4 @@
 const multer = require('multer');
-const sharp = require('sharp');
 
 // controllers
 const factory = require('./handlerFactory');
@@ -13,11 +12,21 @@ const { Certificate, CertCategory } = require('../models/certificateModel');
 const User = require('../models/userModel');
 
 // multer storage
-const multerStorage = multer.memoryStorage();
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/certificates/');
+  },
+  filename: (req, file, cb) => {
+    const extension = file.originalname.split('.').pop();
+    cb(null, `certificate-${Date.now()}.${extension}`);
+  },
+});
 
 // multer filter
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
+  const validExtensions = ['.jpg', '.jpeg', '.png'];
+  const fileExtension = file.originalname.split('.').pop();
+  if (validExtensions.includes(`.${fileExtension}`)) {
     cb(null, true);
   } else {
     cb(new AppError('Mohon upload file sertifikat', 400), false);
@@ -31,19 +40,19 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 exports.uploadFile = upload.single('file');
 
 // resizing uploaded image (middleware)
-exports.resizeFile = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
+// exports.resizeFile = catchAsync(async (req, res, next) => {
+//   if (!req.file) return next();
 
-  req.body.file = `certificate-${Date.now()}.jpeg`;
+//   req.body.file = `certificate-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/certificates/${req.body.file}`);
+//   sharp(req.file.buffer)
+//     .resize(500, 500)
+//     .toFormat('jpeg')
+//     .jpeg({ quality: 90 })
+//     .toFile(`public/img/certificates/${req.body.file}`);
 
-  next();
-});
+//   next();
+// });
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -82,7 +91,6 @@ exports.getCertificate = factory.getOne(
 exports.publishCertificate = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(
     req.body,
-    'file',
     'fileName',
     'category',
     'recepient',
@@ -99,7 +107,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
 
   const recepient = await User.findOne({
     _id: filteredBody.recepient,
-    role: 'certificate-owner',
+    role: 'Certificate Owner',
   });
 
   if (!recepient || !recepient.emailAddress) {
@@ -111,7 +119,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   }
 
   const certificate = await Certificate.create({
-    file: filteredBody.file,
+    file: req.file.path,
     fileName: filteredBody.fileName,
     category: filteredBody.category,
     recepient: filteredBody.recepient,

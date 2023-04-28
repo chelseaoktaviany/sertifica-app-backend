@@ -33,7 +33,7 @@ router
   .post(
     authController.restrictTo('Publisher'),
     certificateController.uploadFile,
-    certificateController.resizeFile,
+    // certificateController.resizeFile,
     certificateController.publishCertificate
   );
 
