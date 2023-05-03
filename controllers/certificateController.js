@@ -1,5 +1,7 @@
 const multer = require('multer');
 
+const path = require('path');
+
 // controllers
 const factory = require('./handlerFactory');
 
@@ -12,21 +14,23 @@ const { Certificate, CertCategory } = require('../models/certificateModel');
 const User = require('../models/userModel');
 
 // multer storage
-const multerStorage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/img/certificates/');
+    cb(null, 'uploads/certificates/');
   },
   filename: (req, file, cb) => {
-    const extension = file.originalname.split('.').pop();
-    cb(null, `certificate-${Date.now()}.${extension}`);
+    const ext = path.extname(file.originalname);
+    cb(null, `certificate-${Date.now()}${ext}`);
   },
 });
 
 // multer filter
-const multerFilter = (req, file, cb) => {
-  const validExtensions = ['.jpg', '.jpeg', '.png'];
-  const fileExtension = file.originalname.split('.').pop();
-  if (validExtensions.includes(`.${fileExtension}`)) {
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
     cb(null, true);
   } else {
     cb(new AppError('Mohon upload file sertifikat', 400), false);
@@ -34,25 +38,14 @@ const multerFilter = (req, file, cb) => {
 };
 
 // using multer middleware multi-part form data (upload pics)
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 1024 * 1024 * 2 },
+});
 
 // upload user photo
 exports.uploadFile = upload.single('file');
-
-// resizing uploaded image (middleware)
-// exports.resizeFile = catchAsync(async (req, res, next) => {
-//   if (!req.file) return next();
-
-//   req.body.file = `certificate-${Date.now()}.jpeg`;
-
-//   sharp(req.file.buffer)
-//     .resize(500, 500)
-//     .toFormat('jpeg')
-//     .jpeg({ quality: 90 })
-//     .toFile(`public/img/certificates/${req.body.file}`);
-
-//   next();
-// });
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -101,6 +94,8 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   // saving file to database
   // if (req.file) filteredBody.file = req.file.filename;
 
+  const file = req.file.path.replace(/\\/g, '/');
+
   const certCategory = await CertCategory.findOne({
     category: filteredBody.category,
   });
@@ -119,7 +114,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   }
 
   const certificate = await Certificate.create({
-    file: req.file.path,
+    file,
     fileName: filteredBody.fileName,
     category: filteredBody.category,
     recepient: filteredBody.recepient,
