@@ -56,6 +56,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
         name: {
           $concat: ['$firstName', ' ', '$lastName'], // combine firstName and lastName fields
         },
+        profileImage: 1,
         role: 1,
       },
     },
