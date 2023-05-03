@@ -41,7 +41,8 @@ app.options('*', cors());
 
 // menyajikan static public
 // backend
-app.use(express.static(path.join(__dirname, 'public')));
+const dirname = path.resolve();
+app.use('/v1/ser/uploads', express.static(path.join(dirname, 'uploads')));
 
 // menggunakan helmet
 app.use(helmet());
