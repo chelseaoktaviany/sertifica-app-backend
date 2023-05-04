@@ -3,6 +3,7 @@ const { promisify } = require('util');
 
 const path = require('path');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -103,6 +104,11 @@ exports.signUp = catchAsync(async (req, res, next) => {
     req.body;
 
   const profileImage = req.file.path.replace(/\\/g, '/');
+  const outputPath = path
+    .join('uploads', 'users', `resized-${req.file.filename}`)
+    .replace(/\\/g, '/');
+
+  sharp(profileImage).resize({ width: 256, height: 256 }).toFile(outputPath);
 
   const user = await User.findOne({
     emailAddress,
@@ -121,7 +127,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       nomorHP,
       jobTitle,
       postalCode,
-      profileImage,
+      profileImage: outputPath,
       role: 'Admin',
     });
 
@@ -138,7 +144,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
       nomorHP,
       jobTitle,
       postalCode,
-      profileImage,
+      profileImage: outputPath,
       role: 'Publisher',
     });
 
