@@ -6,6 +6,8 @@ const certificateController = require('../controllers/certificateController');
 
 const router = express.Router();
 
+router.route('/verification/:id').get(certificateController.getCertificate);
+
 router.use(authController.protect);
 
 // certificate routers
