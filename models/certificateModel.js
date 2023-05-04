@@ -47,7 +47,7 @@ const certificateSchema = new mongoose.Schema(
 certificateSchema.pre(/^find/, function (next) {
   this.populate('recepient').populate({
     path: 'recepient',
-    select: 'firstName lastName emailAddress',
+    select: 'firstName lastName emailAddress profileImage',
   });
 
   next();
