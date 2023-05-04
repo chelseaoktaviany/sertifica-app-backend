@@ -1,4 +1,5 @@
 const multer = require('multer');
+const sharp = require('sharp');
 
 const path = require('path');
 
@@ -95,6 +96,11 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   // if (req.file) filteredBody.file = req.file.filename;
 
   const file = req.file.path.replace(/\\/g, '/');
+  const outputPath = path
+    .join('uploads', 'certificates', `resized-${req.file.filename}`)
+    .replace(/\\/g, '/');
+
+  sharp(file).resize({ width: 500, height: 500 }).toFile(outputPath);
 
   const certCategory = await CertCategory.findOne({
     category: filteredBody.category,
@@ -114,7 +120,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   }
 
   const certificate = await Certificate.create({
-    file,
+    file: outputPath,
     fileName: filteredBody.fileName,
     category: filteredBody.category,
     recepient: filteredBody.recepient,
