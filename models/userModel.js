@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: {
       type: String,
-      default: 'default.jpeg',
+      default: '/uploads/users/default.jpeg',
     },
     otp: {
       type: String,
