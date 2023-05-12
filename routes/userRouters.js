@@ -34,7 +34,7 @@ router.get('/me', userController.getMe, userController.getUser);
 
 // get user certificates
 router.get(
-  '/:id/certificates',
+  '/certificates',
   authController.restrictTo('Certificate Owner'),
   userController.getUserCertificates
 );

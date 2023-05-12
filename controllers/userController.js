@@ -86,7 +86,7 @@ exports.updateUser = factory.updateOne(User, 'Update successful');
 exports.deleteUser = factory.deleteOne(User, 'Delete successful');
 
 exports.getUserCertificates = catchAsync(async (req, res, next) => {
-  const id = req.params.id;
+  const id = req.user.id;
   const certificates = await Certificate.find({
     recepient: id,
   });
@@ -95,7 +95,7 @@ exports.getUserCertificates = catchAsync(async (req, res, next) => {
     status: 0,
     results: certificates.length,
     msg: 'Berhasil mengakses sertifikat pengguna',
-    data: { certificates },
+    data: certificates,
   });
 });
 
