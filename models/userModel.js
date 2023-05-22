@@ -7,7 +7,11 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: function () {
-        if (this.role === 'Publisher' && this.role === 'Admin') {
+        if (
+          this.role === 'Publisher' &&
+          this.role === 'Admin' &&
+          this.role === 'Super Admin'
+        ) {
           return [true, 'You must enter your full name'];
         }
       },
@@ -24,7 +28,11 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: function () {
-        if (this.role !== 'Publisher' && this.role !== 'Admin') {
+        if (
+          this.role !== 'Publisher' &&
+          this.role !== 'Admin' &&
+          this.role !== 'Super Admin'
+        ) {
           return [true, 'You must enter your first name'];
         }
       },
@@ -33,7 +41,11 @@ const userSchema = new mongoose.Schema(
     lastName: {
       type: String,
       required: function () {
-        if (this.role !== 'Publisher' && this.role !== 'Admin') {
+        if (
+          this.role !== 'Publisher' &&
+          this.role !== 'Admin' &&
+          this.role !== 'Super Admin'
+        ) {
           return [true, 'You must enter your last name'];
         }
       },
@@ -107,7 +119,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['Admin', 'Publisher', 'Certificate Owner'],
+      enum: ['Super Admin', 'Admin', 'Publisher', 'Certificate Owner'],
     },
   },
   {
