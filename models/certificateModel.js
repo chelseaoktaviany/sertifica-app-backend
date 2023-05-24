@@ -1,5 +1,20 @@
 const mongoose = require('mongoose');
 
+// function
+function generateCertificateID() {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const length = 64;
+  let certificateId = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    certificateId += characters.charAt(randomIndex);
+  }
+
+  return certificateId;
+}
+
 // adding certificate category
 const certCategorySchema = new mongoose.Schema({
   category: {
@@ -11,6 +26,7 @@ const certCategorySchema = new mongoose.Schema({
 
 const certificateSchema = new mongoose.Schema(
   {
+    certificateId: { type: String, unique: true },
     file: String,
     fileName: {
       type: String,
@@ -44,6 +60,13 @@ const certificateSchema = new mongoose.Schema(
 );
 
 // pre hook middleware
+certificateSchema.pre('save', function (next) {
+  // Generate the certificate ID
+  const certificateId = generateCertificateID();
+  this.certificateId = certificateId;
+  next();
+});
+
 certificateSchema.pre(/^find/, function (next) {
   this.populate('recepient').populate({
     path: 'recepient',
