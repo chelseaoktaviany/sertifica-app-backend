@@ -87,7 +87,6 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     req.body,
     'fileName',
     'category',
-    'recepient',
     'recepientName',
     'recepientEmailAddress'
   );
@@ -107,7 +106,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   });
 
   const recepient = await User.findOne({
-    _id: filteredBody.recepient,
+    emailAddress: filteredBody.recepientEmailAddress,
     role: 'Certificate Owner',
   });
 
@@ -123,7 +122,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     file: outputPath,
     fileName: filteredBody.fileName,
     category: filteredBody.category,
-    recepient: filteredBody.recepient,
+    recepient: recepient._id,
     recepientName: filteredBody.recepientName,
     recepientEmailAddress: filteredBody.recepientEmailAddress,
   });
