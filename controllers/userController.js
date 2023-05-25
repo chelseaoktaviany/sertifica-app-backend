@@ -48,7 +48,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const user = await User.aggregate([
     {
-      $match: { isActive: true },
+      $match: { isActive: true, role: { $nin: ['Admin', 'Super Admin'] } },
     },
     {
       $project: {
