@@ -130,6 +130,22 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   res.status(201).json({
     status: 0,
     msg: 'Berhasil menambahkan data sertifikat',
-    data: { certificate },
+    data: certificate,
+  });
+});
+
+exports.verifyCertificate = catchAsync(async (req, res, next) => {
+  const { certificateId } = req.params;
+
+  const certificate = await Certificate.findOne({ certificateId });
+
+  if (!certificate) {
+    return next(new AppError('Certificate ID not found', 404));
+  }
+
+  res.status(200).json({
+    status: 0,
+    msg: 'Berhasil verifikasi sertifikat',
+    data: certificate,
   });
 });
