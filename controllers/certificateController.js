@@ -11,7 +11,9 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 // models
-const { Certificate, CertCategory } = require('../models/certificateModel');
+const Certificate = require('../models/certificateModel');
+const CertCategory = require('../models/cerCategoryModel');
+
 const User = require('../models/userModel');
 
 // multer storage
@@ -69,10 +71,30 @@ exports.addCertCategory = factory.createOne(
 );
 
 // get all certificates
+
 exports.getAllCertificates = factory.getAll(
   Certificate,
   'Berhasil mengakses data sertifikat'
 );
+
+exports.getAllCertificatesByCategory = catchAsync(async (req, res, next) => {
+  const { cerCategorySlug } = req.params;
+
+  const certificate = await Certificate.find({
+    cerCategorySlug: cerCategorySlug,
+  });
+
+  if (!certificate) {
+    return next(new AppError('No certificate found', 404));
+  }
+
+  return res.status(200).json({
+    status: 0,
+    result: certificate.length,
+    msg: 'Retrieved data certificates successfully',
+    data: certificate,
+  });
+});
 
 // get certificates
 exports.getCertificate = factory.getOne(
@@ -86,7 +108,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(
     req.body,
     'fileName',
-    'category',
+    'categoryName',
     'recepientName',
     'recepientEmailAddress'
   );
@@ -102,7 +124,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   sharp(file).resize({ width: 500, height: 500 }).toFile(outputPath);
 
   const certCategory = await CertCategory.findOne({
-    category: filteredBody.category,
+    categoryName: filteredBody.categoryName,
   });
 
   const recepient = await User.findOne({
@@ -121,7 +143,9 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   const certificate = await Certificate.create({
     file: outputPath,
     fileName: filteredBody.fileName,
-    category: filteredBody.category,
+    category: certCategory._id,
+    categoryName: filteredBody.categoryName,
+    categorySlug: certCategory.cerCategorySlug,
     recepient: recepient._id,
     recepientName: filteredBody.recepientName,
     recepientEmailAddress: filteredBody.recepientEmailAddress,
