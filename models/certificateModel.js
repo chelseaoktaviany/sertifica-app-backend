@@ -36,7 +36,6 @@ const certificateSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.String,
       ref: 'CertCategory',
     },
-    // recepient
     recepient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
