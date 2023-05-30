@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const { generateNameSlug } = require('../utils/slugify');
-
 // function
 function generateCertificateID() {
   const characters =
@@ -35,13 +33,10 @@ const certificateSchema = new mongoose.Schema(
       ref: 'CertCategory',
       required: [true, 'Nama kategori harus ada di sertifikat'],
     },
-    cerCategorySlug: {
-      type: String,
-      index: true,
-    },
     recepient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: [true, 'Pemilik sertifikat harus ada di sertifikat'],
     },
     recepientName: {
       type: mongoose.Schema.Types.String,
@@ -69,29 +64,19 @@ certificateSchema.pre('save', function (next) {
   next();
 });
 
-certificateSchema.pre('save', function (next) {
-  if (this.isNew || this.isModified('categoryName')) {
-    this.cerCategorySlug = generateNameSlug(this.categoryName);
-  }
-  next();
-});
-
 certificateSchema.pre(/^find/, function (next) {
-  this.populate('recepient').populate({
-    path: 'recepient',
-    select: 'firstName lastName emailAddress profileImage',
-  });
-
   this.populate('category').populate({
     path: 'category',
     select: 'categoryName cerCategorySlug',
   });
 
+  this.populate('recepient').populate({
+    path: 'recepient',
+    select: 'firstName lastName emailAddress profileImage',
+  });
+
   next();
 });
-
-// indexing
-certificateSchema.index({ cerCategorySlug: 1 });
 
 const Certificate = mongoose.model('Certificate', certificateSchema);
 
