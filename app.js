@@ -21,6 +21,7 @@ const globalErrorHandler = require('./controllers/errorController');
 // routers
 const userRouters = require('./routes/userRouters');
 const certificateRouters = require('./routes/certificateRouters');
+const certCategoryRouters = require('./routes/certCategoryRouters');
 
 // memulai aplikasi express
 const app = express();
@@ -148,6 +149,7 @@ app.use((req, res, next) => {
 // api routes
 app.use('/v1/ser/users', userRouters);
 app.use('/v1/ser/certificates', certificateRouters);
+app.use('/v1/ser/certCategory', certCategoryRouters);
 
 // jika endpoint tidak ditemukan
 app.all('*', (req, res, next) => {
