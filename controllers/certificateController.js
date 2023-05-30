@@ -12,7 +12,7 @@ const catchAsync = require('../utils/catchAsync');
 
 // models
 const Certificate = require('../models/certificateModel');
-const CertCategory = require('../models/cerCategoryModel');
+const CertCategory = require('../models/certCategoryModel');
 
 const User = require('../models/userModel');
 
@@ -58,43 +58,12 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-// get all categories
-exports.getAllCertCategories = factory.getAll(
-  CertCategory,
-  'Berhasil mengakses data sertifikat kategori'
-);
-
-// add category
-exports.addCertCategory = factory.createOne(
-  CertCategory,
-  'Added category successful'
-);
-
 // get all certificates
 
 exports.getAllCertificates = factory.getAll(
   Certificate,
   'Berhasil mengakses data sertifikat'
 );
-
-exports.getAllCertificatesByCategory = catchAsync(async (req, res, next) => {
-  const { cerCategorySlug } = req.params;
-
-  const certificate = await Certificate.find({
-    cerCategorySlug: cerCategorySlug,
-  });
-
-  if (!certificate) {
-    return next(new AppError('No certificate found', 404));
-  }
-
-  return res.status(200).json({
-    status: 0,
-    result: certificate.length,
-    msg: 'Retrieved data certificates successfully',
-    data: certificate,
-  });
-});
 
 // get certificates
 exports.getCertificate = factory.getOne(
@@ -170,6 +139,27 @@ exports.verifyCertificate = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 0,
     msg: 'Berhasil verifikasi sertifikat',
+    data: certificate,
+  });
+});
+
+exports.getAllCertificatesByCategory = catchAsync(async (req, res, next) => {
+  const { cerCategorySlug } = req.params;
+
+  const category = await CertCategory.findOne({ cerCategorySlug });
+
+  const certificate = await Certificate.find({
+    category: category._id,
+  });
+
+  if (!certificate) {
+    return next(new AppError('No certificate found', 404));
+  }
+
+  return res.status(200).json({
+    status: 0,
+    result: certificate.length,
+    msg: 'Retrieved data certificates successfully',
     data: certificate,
   });
 });
