@@ -6,7 +6,7 @@ const factory = require('./handlerFactory');
 
 // models
 const User = require('../models/userModel');
-const { Certificate } = require('../models/certificateModel');
+const Certificate = require('../models/certificateModel');
 
 // util
 const catchAsync = require('../utils/catchAsync');
