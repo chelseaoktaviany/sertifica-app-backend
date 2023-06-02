@@ -17,10 +17,7 @@ router.use(authController.protect);
 // certificates
 router
   .route('/')
-  .get(
-    authController.restrictTo('Publisher'),
-    certificateController.getAllCertificates
-  )
+  .get(certificateController.getAllCertificates)
   .post(
     authController.restrictTo('Publisher'),
     certificateController.uploadFile,
@@ -37,9 +34,6 @@ router
 
 router
   .route('/category/:cerCategorySlug')
-  .get(
-    authController.restrictTo('Publisher'),
-    certificateController.getAllCertificatesByCategory
-  );
+  .get(certificateController.getAllCertificatesByCategory);
 
 module.exports = router;
