@@ -39,6 +39,12 @@ router.get(
   userController.getUserCertificates
 );
 
+router.patch(
+  '/certificates/:id/claim',
+  authController.restrictTo('Certificate Owner'),
+  userController.claimCertificate
+);
+
 router.post(
   '/',
   authController.restrictTo('Publisher'),
@@ -46,7 +52,7 @@ router.post(
 );
 
 // user management
-router.use(authController.restrictTo('Admin'));
+router.use(authController.restrictTo('Admin', 'Super Admin'));
 
 router.route('/').get(userController.getAllUsers);
 

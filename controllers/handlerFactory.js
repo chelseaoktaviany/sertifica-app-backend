@@ -12,7 +12,7 @@ exports.deleteOne = (Model, message) =>
     }
 
     // send response
-    res.status(204).json({
+    res.status(200).json({
       status: 0,
       msg: message,
       data: [],

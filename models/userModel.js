@@ -128,6 +128,16 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// pre hook
+// userSchema.pre(/^find/, function (next) {
+//   // this points to the current query
+//   this.find({
+//     isActive: { $ne: false },
+//     role: { $nin: ['Admin', 'Super Admin'] },
+//   });
+//   next();
+// });
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

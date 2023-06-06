@@ -48,6 +48,10 @@ const certificateSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'Mohon isi alamat e-mail pemilik sertifikat'],
     },
+    isClaimed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },

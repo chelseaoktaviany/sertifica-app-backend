@@ -69,6 +69,11 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
+// exports.getAllUsers = factory.getAll(
+//   User,
+//   "Retrieved all user's data successfully"
+// );
+
 // get user
 exports.getMe = catchAsync(async (req, res, next) => {
   req.params.id = req.user.id;
@@ -96,6 +101,25 @@ exports.getUserCertificates = catchAsync(async (req, res, next) => {
     results: certificates.length,
     msg: 'Berhasil mengakses sertifikat pengguna',
     data: certificates,
+  });
+});
+
+exports.claimCertificate = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+
+  const certificate = await Certificate.findByIdAndUpdate(
+    { _id: id },
+    { isClaimed: true }
+  );
+
+  if (!certificate) {
+    return next(new AppError('Certificate ID not found', 404));
+  }
+
+  res.status(200).json({
+    status: 0,
+    msg: 'Claim successful',
+    data: certificate,
   });
 });
 
