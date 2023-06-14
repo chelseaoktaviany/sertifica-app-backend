@@ -88,6 +88,28 @@ exports.getUser = factory.getOne(
 
 exports.updateUser = factory.updateOne(User, 'Update successful');
 
+// exports.updateUser = catchAsync(async (req, res, next) => {
+//   const id = req.params.id;
+
+//   const { name, role } = req.body;
+
+//   const user = await User.findByIdAndUpdate(
+//     { _id: id },
+//     { name, role },
+//     { new: true, runValidators: false }
+//   );
+
+//   if (!user) {
+//     return next(new AppError('User not found', 404));
+//   }
+
+//   res.status(200).json({
+//     status: 0,
+//     msg: 'Update successful',
+//     data: user,
+//   });
+// });
+
 exports.deleteUser = factory.deleteOne(User, 'Delete successful');
 
 exports.getUserCertificates = catchAsync(async (req, res, next) => {
