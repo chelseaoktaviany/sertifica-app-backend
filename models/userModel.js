@@ -138,6 +138,11 @@ const userSchema = new mongoose.Schema(
 //   next();
 // });
 
+userSchema.pre('save', function (next) {
+  this.name = `${this.firstName} ${this.lastName}`;
+  next();
+});
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
