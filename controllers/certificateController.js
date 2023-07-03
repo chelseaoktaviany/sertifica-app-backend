@@ -1,5 +1,4 @@
 const multer = require('multer');
-const sharp = require('sharp');
 
 const path = require('path');
 
@@ -72,6 +71,26 @@ exports.getCertificate = factory.getOne(
   'Berhasil mengakses data sertifikat'
 );
 
+// upload certificate
+// exports.uploadCertificate = catchAsync(async (req, res, next) => {
+//   const file = req.file.path.replace(/\\/g, '/');
+//   const outputPath = path
+//     .join('uploads', 'certificates', `resized-${req.file.filename}`)
+//     .replace(/\\/g, '/');
+
+//   sharp(file).resize({ width: 500, height: 500 }).toFile(outputPath);
+
+//   const certificate = await Certificate.create({
+//     file: outputPath,
+//   });
+
+//   res.status(201).json({
+//     status: 0,
+//     msg: 'Berhasil menambahkan data sertifikat',
+//     data: certificate,
+//   });
+// });
+
 // add certificate
 exports.publishCertificate = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(
@@ -85,12 +104,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   // saving file to database
   // if (req.file) filteredBody.file = req.file.filename;
 
-  const file = req.file.path.replace(/\\/g, '/');
-  const outputPath = path
-    .join('uploads', 'certificates', `resized-${req.file.filename}`)
-    .replace(/\\/g, '/');
-
-  sharp(file).resize({ width: 500, height: 500 }).toFile(outputPath);
+  const url = `${req.protocol}://${req.get('host')}/v1/ga`;
 
   const certCategory = await CertCategory.findOne({
     categoryName: filteredBody.categoryName,
@@ -110,7 +124,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
   }
 
   const certificate = await Certificate.create({
-    file: outputPath,
+    file: `${url}/uploads/certificates/${req.file.filename}`,
     fileName: filteredBody.fileName,
     category: certCategory._id,
     categoryName: filteredBody.categoryName,
