@@ -71,26 +71,6 @@ exports.getCertificate = factory.getOne(
   'Berhasil mengakses data sertifikat'
 );
 
-// upload certificate
-// exports.uploadCertificate = catchAsync(async (req, res, next) => {
-//   const file = req.file.path.replace(/\\/g, '/');
-//   const outputPath = path
-//     .join('uploads', 'certificates', `resized-${req.file.filename}`)
-//     .replace(/\\/g, '/');
-
-//   sharp(file).resize({ width: 500, height: 500 }).toFile(outputPath);
-
-//   const certificate = await Certificate.create({
-//     file: outputPath,
-//   });
-
-//   res.status(201).json({
-//     status: 0,
-//     msg: 'Berhasil menambahkan data sertifikat',
-//     data: certificate,
-//   });
-// });
-
 // add certificate
 exports.publishCertificate = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(
@@ -100,9 +80,6 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     'recepientName',
     'recepientEmailAddress'
   );
-
-  // saving file to database
-  // if (req.file) filteredBody.file = req.file.filename;
 
   const url = `${req.protocol}://${req.get('host')}/v1/ga`;
 
