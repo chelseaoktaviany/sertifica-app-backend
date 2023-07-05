@@ -81,7 +81,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     'recepientEmailAddress'
   );
 
-  const url = `${req.protocol}://${req.get('host')}/v1/ga`;
+  const url = `${req.protocol}://${req.get('host')}/v1/ser`;
 
   const certCategory = await CertCategory.findOne({
     categoryName: filteredBody.categoryName,
