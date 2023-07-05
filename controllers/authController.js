@@ -377,3 +377,22 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.checkEmail = catchAsync(async (req, res, next) => {
+  emailAddress = req.body.recepientEmailAddress;
+
+  const cerOwner = await User.findOne({
+    emailAddress: emailAddress,
+    role: 'Certificate Owner',
+  });
+
+  if (!cerOwner) {
+    return next(new AppError('This e-mail has not been registered', 404));
+  }
+
+  res.status(200).json({
+    status: 0,
+    msg: 'Berhasil memeriksa e-mail pemilik sertifikat',
+    data: cerOwner,
+  });
+});
