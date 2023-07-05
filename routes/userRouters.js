@@ -51,6 +51,12 @@ router.post(
   userController.createCertificateOwner
 );
 
+router.post(
+  '/check-email',
+  authController.restrictTo('Publisher'),
+  authController.checkEmail
+);
+
 // user management
 router.use(authController.restrictTo('Admin', 'Super Admin'));
 
