@@ -10,7 +10,7 @@ router.use(authController.protect);
 
 // certificate routers
 
-router.use(authController.restrictTo('Publisher'));
+router.use(authController.restrictTo('Publisher', 'Admin'));
 
 // certificate category
 router
