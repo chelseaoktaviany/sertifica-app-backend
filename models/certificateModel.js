@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { generateNameSlug } = require('../utils/slugify');
 
 // function
 function generateCertificateID() {
@@ -33,6 +34,11 @@ const certificateSchema = new mongoose.Schema(
       ref: 'CertCategory',
       required: [true, 'Nama kategori harus ada di sertifikat'],
     },
+    categorySlug: {
+      type: mongoose.Schema.Types.String,
+      ref: 'CertCategory',
+      required: [true, 'Kategori slug harus ada di sertifikat'],
+    },
     recepient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -61,6 +67,15 @@ const certificateSchema = new mongoose.Schema(
 );
 
 // pre hook middleware
+certificateSchema.pre('save', function (next) {
+  if (this.isNew || this.isModified('categoryName')) {
+    this.cerCategorySlug = generateNameSlug(this.categoryName);
+  }
+  next();
+});
+
+certificateSchema.index({ cerCategorySlug: 1 });
+
 certificateSchema.pre('save', function (next) {
   // Generate the certificate ID
   const certificateId = generateCertificateID();
