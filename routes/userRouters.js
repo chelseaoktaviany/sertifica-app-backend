@@ -14,12 +14,7 @@ const {
 const router = express.Router();
 
 // authentication
-router.post(
-  '/signUp',
-  authController.uploadUserPhoto,
-  // authController.resizeUserPhoto,
-  authController.signUp
-);
+router.post('/signUp', authController.uploadUserPhoto, authController.signUp);
 
 router.post('/signIn', authController.signIn);
 router.get('/signOut', authController.signOut);
@@ -65,11 +60,7 @@ router.route('/').get(userController.getAllUsers);
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(
-    userController.uploadUserPhoto,
-    // userController.resizeUserPhoto,
-    userController.updateUser
-  )
+  .patch(userController.uploadUserPhoto, userController.updateUser)
   .delete(userController.deleteUser);
 
 module.exports = router;
