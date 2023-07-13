@@ -69,11 +69,6 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.getAllUsers = factory.getAll(
-//   User,
-//   "Retrieved all user's data successfully"
-// );
-
 // get user
 exports.getMe = catchAsync(async (req, res, next) => {
   req.params.id = req.user.id;
