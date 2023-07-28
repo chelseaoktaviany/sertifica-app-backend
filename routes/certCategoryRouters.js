@@ -18,4 +18,9 @@ router
   .get(certCategoryController.getAllCertCategories)
   .post(certCategoryController.addCertCategory);
 
+router
+  .route('/:id')
+  .patch(certCategoryController.editCertCategory)
+  .delete(certCategoryController.deleteCertCategory);
+
 module.exports = router;
