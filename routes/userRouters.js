@@ -55,7 +55,7 @@ router.post(
 // user management
 router.use(authController.restrictTo('Admin', 'Super Admin'));
 
-router.route('/').get(userController.getAllUsers);
+router.route('/').get(userController.getAllUsersRole);
 
 router
   .route('/:id')
