@@ -129,14 +129,14 @@ const userSchema = new mongoose.Schema(
 );
 
 // pre hook
-// userSchema.pre(/^find/, function (next) {
-//   // this points to the current query
-//   this.find({
-//     isActive: { $ne: false },
-//     role: { $nin: ['Admin', 'Super Admin'] },
-//   });
-//   next();
-// });
+userSchema.pre(/^find/, function (next) {
+  // this points to the current query
+  this.find({
+    isActive: { $ne: false },
+  });
+
+  next();
+});
 
 userSchema.pre('save', function (next) {
   this.name = `${this.firstName} ${this.lastName}`;
