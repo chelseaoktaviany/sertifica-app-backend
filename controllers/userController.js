@@ -45,30 +45,6 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const user = await User.aggregate([
-    {
-      $match: { isActive: true, role: { $nin: ['Admin', 'Super Admin'] } },
-    },
-    {
-      $project: {
-        _id: 1,
-        name: {
-          $concat: ['$firstName', ' ', '$lastName'], // combine firstName and lastName fields
-        },
-        profileImage: 1,
-        role: 1,
-      },
-    },
-  ]);
-
-  res.status(200).json({
-    status: 0,
-    msg: "Retrieved all users' data successfully",
-    data: user,
-  });
-});
-
 exports.getAllUsersRole = factory.getAll(
   User,
   'Retrieved all users successfully'
