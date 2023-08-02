@@ -32,8 +32,4 @@ router
     certificateController.getCertificate
   );
 
-router
-  .route('/category/:cerCategorySlug')
-  .get(certificateController.getAllCertificatesByCategory);
-
 module.exports = router;
