@@ -133,24 +133,3 @@ exports.verifyCertificate = catchAsync(async (req, res, next) => {
     data: certificate,
   });
 });
-
-exports.getAllCertificatesByCategory = catchAsync(async (req, res, next) => {
-  const { cerCategorySlug } = req.params;
-
-  const category = await CertCategory.findOne({ cerCategorySlug });
-
-  const certificate = await Certificate.find({
-    category: category._id,
-  });
-
-  if (!certificate) {
-    return next(new AppError('No certificate found', 404));
-  }
-
-  return res.status(200).json({
-    status: 0,
-    result: certificate.length,
-    msg: 'Retrieved data certificates successfully',
-    data: certificate,
-  });
-});
