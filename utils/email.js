@@ -8,10 +8,7 @@ module.exports = class Email {
     this.to = user.emailAddress;
     this.otp = user.otp;
     this.url = url;
-    this.from =
-      process.env.NODE_ENV === 'production'
-        ? `admin <${process.env.EMAIL_FROM_PROD}>`
-        : `admin <${process.env.EMAIL_FROM_DEV}>`;
+    this.from = `admin <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
@@ -29,13 +26,13 @@ module.exports = class Email {
 
     // dev (using mailtrap)
     return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST_DEV,
-      port: process.env.EMAIL_PORT_DEV,
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       secure: false,
       logger: true,
       auth: {
-        user: process.env.EMAIL_USERNAME_DEV,
-        pass: process.env.EMAIL_PASSWORD_DEV,
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
   }
