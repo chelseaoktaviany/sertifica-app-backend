@@ -47,7 +47,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 exports.getAllUsersRole = factory.getAll(
   User,
-  'Retrieved all users successfully'
+  "Retrieved all users' data successfully"
 );
 
 // get user

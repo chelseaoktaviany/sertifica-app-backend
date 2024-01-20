@@ -105,7 +105,7 @@ exports.publishCertificate = catchAsync(async (req, res, next) => {
     fileName: filteredBody.fileName,
     category: certCategory._id,
     categoryName: filteredBody.categoryName,
-    categorySlug: certCategory.cerCategorySlug,
+    cerCategorySlug: certCategory.cerCategorySlug,
     recepient: recepient._id,
     recepientName: filteredBody.recepientName,
     recepientEmailAddress: filteredBody.recepientEmailAddress,
