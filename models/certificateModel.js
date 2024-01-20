@@ -34,7 +34,7 @@ const certificateSchema = new mongoose.Schema(
       ref: 'CertCategory',
       required: [true, 'Nama kategori harus ada di sertifikat'],
     },
-    categorySlug: {
+    cerCategorySlug: {
       type: mongoose.Schema.Types.String,
       ref: 'CertCategory',
       required: [true, 'Kategori slug harus ada di sertifikat'],
